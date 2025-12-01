@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDI Tracker - Plano de Desenvolvimento Individual</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+      };
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+    />
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/toastify-js"
+    ></script>
+    <script src="i18n.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body
+    class="bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-200"
+  >
+    <div class="container mx-auto px-4 py-4 max-w-5xl">
+      <div class="flex justify-end items-center gap-2 mb-2">
+        <button
+          onclick="app.toggleDarkMode()"
+          id="btnDarkMode"
+          class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+          title="Toggle Dark Mode"
+        >
+          <i
+            data-lucide="sun"
+            class="w-4 h-4 text-gray-700 dark:text-gray-300 dark-mode-icon-light"
+          ></i>
+          <i
+            data-lucide="moon"
+            class="w-4 h-4 text-gray-700 dark:text-gray-300 hidden dark-mode-icon-dark"
+          ></i>
+        </button>
+        <div
+          class="flex items-center gap-1.5 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-1"
+        >
+          <button
+            onclick="app.changeLanguage('pt')"
+            id="btnLangPT"
+            class="w-7 h-7 rounded-full flex items-center justify-center text-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 transition cursor-pointer"
+            title="Português"
+          >
+            🇧🇷
+          </button>
+          <button
+            onclick="app.changeLanguage('en')"
+            id="btnLangEN"
+            class="w-7 h-7 rounded-full flex items-center justify-center text-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 transition cursor-pointer"
+            title="English"
+          >
+            🇺🇸
+          </button>
+        </div>
+      </div>
+
+      <div class="text-center mb-4">
+        <div class="flex justify-center mb-2">
+          <div
+            class="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg"
+          >
+            <i data-lucide="graduation-cap" class="w-7 h-7 text-white"></i>
+          </div>
+        </div>
+        <h1
+          class="text-3xl font-bold text-gray-800 dark:text-white mb-1"
+          data-i18n="appTitle"
+        >
+          PDI Tracker
+        </h1>
+        <p
+          class="text-sm text-gray-500 dark:text-gray-400"
+          data-i18n="appSubtitle"
+        >
+          Plano de Desenvolvimento Individual
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm">
+          <div class="flex justify-center mb-2">
+            <div
+              class="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center"
+            >
+              <i
+                data-lucide="clock"
+                class="w-5 h-5 text-purple-600 dark:text-purple-400"
+              ></i>
+            </div>
+          </div>
+          <div
+            class="text-2xl font-bold text-gray-800 dark:text-white text-center"
+            id="totalEstudado"
+          >
+            0h
+          </div>
+          <div
+            class="text-xs text-gray-500 dark:text-gray-400 text-center mt-1"
+            data-i18n="totalStudied"
+          >
+            Total Estudado
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm">
+          <div class="flex justify-center mb-2">
+            <div
+              class="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center"
+            >
+              <i
+                data-lucide="loader"
+                class="w-5 h-5 text-purple-600 dark:text-purple-400"
+              ></i>
+            </div>
+          </div>
+          <div
+            class="text-2xl font-bold text-gray-800 dark:text-white text-center"
+            id="emAndamento"
+          >
+            0
+          </div>
+          <div
+            class="text-xs text-gray-500 dark:text-gray-400 text-center mt-1"
+            data-i18n="inProgress"
+          >
+            Em Andamento
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm">
+          <div class="flex justify-center mb-2">
+            <div
+              class="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center"
+            >
+              <i
+                data-lucide="check-circle"
+                class="w-5 h-5 text-purple-600 dark:text-purple-400"
+              ></i>
+            </div>
+          </div>
+          <div
+            class="text-2xl font-bold text-gray-800 dark:text-white text-center"
+            id="concluidos"
+          >
+            0
+          </div>
+          <div
+            class="text-xs text-gray-500 dark:text-gray-400 text-center mt-1"
+            data-i18n="completed"
+          >
+            Concluídos
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm mb-4">
+        <div
+          class="flex flex-col md:flex-row items-center justify-between gap-6"
+        >
+          <div class="flex-1">
+            <h3
+              class="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2"
+              data-i18n="overallProgress"
+            >
+              Progresso Geral
+            </h3>
+            <div class="flex items-end gap-3">
+              <div>
+                <div
+                  class="text-3xl font-bold text-purple-600 dark:text-purple-400"
+                  id="progressoPercentual"
+                >
+                  0%
+                </div>
+                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <span id="horasRealizadas">0</span>h /
+                  <span id="horasMeta">0</span>h
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="relative flex items-center justify-center">
+            <svg class="transform -rotate-90" width="100" height="100">
+              <circle
+                cx="50"
+                cy="50"
+                r="40"
+                stroke="currentColor"
+                class="text-gray-200 dark:text-gray-700"
+                stroke-width="8"
+                fill="none"
+              />
+              <circle
+                id="progressCircle"
+                cx="50"
+                cy="50"
+                r="40"
+                stroke="currentColor"
+                class="text-purple-600 dark:text-purple-400"
+                stroke-width="8"
+                fill="none"
+                stroke-dasharray="251.2"
+                stroke-dashoffset="251.2"
+                stroke-linecap="round"
+                style="transition: stroke-dashoffset 1s ease"
+              />
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <i
+                data-lucide="target"
+                class="w-6 h-6 text-purple-600 dark:text-purple-400"
+              ></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap justify-center gap-2 mb-4">
+        <button
+          id="btnRelatorio"
+          class="bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-50 dark:hover:bg-gray-700 transition shadow-sm flex items-center gap-2"
+        >
+          <i data-lucide="file-text" class="w-4 h-4"></i>
+          <span data-i18n="reportPDF">Relatório PDF</span>
+        </button>
+        <button
+          id="btnExportar"
+          class="bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-50 dark:hover:bg-gray-700 transition shadow-sm flex items-center gap-2"
+        >
+          <i data-lucide="download" class="w-4 h-4"></i>
+          <span data-i18n="exportPlan">Exportar Plano</span>
+        </button>
+        <button
+          id="btnImportar"
+          class="bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-50 dark:hover:bg-gray-700 transition shadow-sm flex items-center gap-2"
+        >
+          <i data-lucide="upload" class="w-4 h-4"></i>
+          <span data-i18n="importPlan">Importar Plano</span>
+        </button>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm mb-4">
+        <h2
+          class="text-lg font-bold text-gray-800 dark:text-white mb-3 flex items-center gap-2"
+        >
+          <div
+            class="w-7 h-7 bg-purple-600 rounded-full flex items-center justify-center"
+          >
+            <i data-lucide="plus" class="w-3.5 h-3.5 text-white"></i>
+          </div>
+          <span data-i18n="newTheme">Novo Tema</span>
+        </h2>
+        <form id="formNovoTema" class="flex flex-col md:flex-row gap-2">
+          <input
+            type="text"
+            id="inputNomeTema"
+            data-i18n-placeholder="themeName"
+            placeholder="Nome do tema (ex: JavaScript)"
+            class="flex-1 px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+            required
+          />
+          <input
+            type="number"
+            id="inputHorasMeta"
+            placeholder="20"
+            min="1"
+            class="w-full md:w-24 px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+            required
+          />
+          <span
+            class="hidden md:flex items-center text-gray-500 dark:text-gray-400 text-xs whitespace-nowrap"
+            data-i18n="hoursGoal"
+            >horas de meta</span
+          >
+          <button
+            type="submit"
+            class="bg-purple-600 text-white px-6 py-2 text-sm rounded-lg font-medium hover:bg-purple-700 transition"
+            data-i18n="addButton"
+          >
+            Adicionar
+          </button>
+        </form>
+      </div>
+
+      <div
+        id="barraSelecao"
+        class="bg-white dark:bg-gray-800 rounded-2xl p-3 shadow-sm mb-3 hidden"
+      >
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-3">
+            <span
+              id="contadorSelecao"
+              class="text-xs font-medium text-gray-700 dark:text-gray-300"
+            ></span>
+            <button
+              id="btnSelecionarTodos"
+              onclick="app.selecionarTodos()"
+              class="text-xs text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium"
+            >
+              <span data-i18n="selectAll">Selecionar Todos</span>
+            </button>
+          </div>
+          <div class="flex items-center gap-2">
+            <button
+              id="btnDeletarSelecionados"
+              onclick="app.deletarSelecionados()"
+              class="hidden px-3 py-1.5 text-xs bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition flex items-center gap-2"
+            >
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              <span data-i18n="deleteSelected">Deletar Selecionados</span>
+            </button>
+            <button
+              onclick="app.toggleModoSelecao()"
+              class="px-3 py-1.5 text-xs bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-lg transition"
+              data-i18n="cancelButton"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center mb-3">
+        <h2
+          class="text-base font-semibold text-gray-700 dark:text-gray-200"
+          data-i18n="myThemes"
+        >
+          Meus Temas
+        </h2>
+        <button
+          id="btnModoSelecao"
+          onclick="app.toggleModoSelecao()"
+          class="text-xs text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium flex items-center gap-1"
+        >
+          <i data-lucide="list-checks" class="w-3.5 h-3.5"></i>
+          <span data-i18n="selectButton">Selecionar</span>
+        </button>
+      </div>
+
+      <div id="listaTemas" class="space-y-4"></div>
+    </div>
+
+    <input type="file" id="inputArquivo" accept=".json" class="hidden" />
+
+    <script src="script.js"></script>
+    <script>
+      lucide.createIcons();
+    </script>
+  </body>
+</html>
